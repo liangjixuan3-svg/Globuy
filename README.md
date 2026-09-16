@@ -2,9 +2,9 @@
 
 > 一个基于 SpringBoot 和 Vue 3 的留学生二手交易平台。
 
-作者：良暨宣 · [在线体验](https://liangjixuan3-svg.github.io/Globuy/) · [源码仓库](https://github.com/liangjixuan3-svg/Globuy)
-
 ## 在线体验（无需本地部署）
+
+[点击进入在线体验](https://liangjixuan3-svg.github.io/Globuy/)
 
 打开在线体验链接后默认进入普通用户首页。页面顶部可切换到登录页：
 
