@@ -1,11 +1,12 @@
 import { createApp } from 'vue'
 import App from './App.vue'
 import router from './router'
+import originalData from './demo/original-data.json'
 const app = createApp(App)
 app.config.globalProperties.$demoMode = import.meta.env.VITE_DEMO_MODE === 'true'
 if (import.meta.env.VITE_DEMO_MODE === 'true') {
   // Do not reuse local-backend credentials in the demo build.
-  localStorage.setItem('account', JSON.stringify({ id: 1, username: 'demo', nickname: '演示买家', role: 'ROLE_USER', token: 'demo-only-not-a-real-token' }))
+  localStorage.setItem('account', JSON.stringify({ ...originalData.sysUser[0], role: 'ROLE_USER', token: 'demo-only-not-a-real-token' }))
 }
 app.use(router)
 

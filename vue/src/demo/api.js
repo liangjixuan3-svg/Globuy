@@ -1,7 +1,7 @@
-// Entirely synthetic fixtures. Never import the original SQL dump or uploaded files.
+// In-memory demo only; the optional seed contains author-approved fictional business records.
 const illustration = (label, icon = '✦', color = '#fff2b3') => 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" width="900" height="600" viewBox="0 0 900 600"><rect width="900" height="600" fill="${color}"/><circle cx="450" cy="250" r="150" fill="white" opacity=".7"/><text x="450" y="290" text-anchor="middle" font-size="120">${icon}</text><text x="450" y="490" text-anchor="middle" font-family="sans-serif" font-size="42" fill="#343434">${label}</text></svg>`)
 
-export function createDemoApi() {
+export function createDemoApi(seed, baseUrl = '/') {
   let account = { id: 1, username: 'demo', nickname: '演示买家', role: 'ROLE_USER', token: 'demo-only-not-a-real-token', avatarUrl: illustration('DEMO', '☺'), email: 'demo@example.invalid', phone: '', school: '示例大学', isAuth: true }
   const users = [account, { ...account, id: 2, username: 'seller', nickname: '校园好物分享者', email: 'seller@example.invalid', avatarUrl: illustration('SELLER', '☺', '#d9efed') }]
   const admins = [{ ...account, id: 100, username: 'admin', nickname: '演示管理员', role: 'ROLE_ADMIN' }]
@@ -16,6 +16,18 @@ export function createDemoApi() {
   const banners = [{ id: 1, name: '让闲置好物继续发光', img: illustration('校园好物 · 让闲置继续发光', '✦') }]
   const chats = [{ id: 1, text: '你好，支持校园面交吗？（模拟消息）', type: '文字', time: '2026-09-01 10:00:00', fromUserId: 2, toUserId: 1, isRead: true }]
   let nextId = 1000
+  if (seed) {
+    const restore = value => typeof value === 'string' ? value.replace(/demo-assets\/(?:80f3266cae764cc89b5fdace97f09240\.JPG|65318436b3cd4bd2a469735ae7b3f122\.png)/g, 'demo-assets/missing.svg').replaceAll('demo-assets/', baseUrl + 'demo-assets/') : Array.isArray(value) ? value.map(restore) : value && typeof value === 'object' ? Object.fromEntries(Object.entries(value).map(([k, v]) => [k, restore(v)])) : value
+    const data = restore(structuredClone(seed))
+    for (const [target, source] of [[users, data.sysUser], [admins, data.sysAdmin], [types, data.type], [goods, data.goods], [orders, data.orders], [addresses, data.address], [notices, data.notice], [banners, data.banner], [chats, data.chat]]) target.splice(0, target.length, ...source)
+    for (const u of users) Object.assign(u, { role: 'ROLE_USER', token: 'demo-only-not-a-real-token', isAuth: Boolean(u.isAuth) })
+    for (const t of types) t.status = Boolean(t.status)
+    for (const u of admins) Object.assign(u, { role: 'ROLE_ADMIN', token: 'demo-only-not-a-real-token' })
+    account = users[0]
+    collects = data.collect.filter(c => c.userId === account.id).map(c => c.itemId)
+    for (const g of goods) Object.assign(g, { typeName: types.find(t => t.id === g.typeId)?.name, school: users.find(u => u.id === g.userId)?.school, isAuth: users.find(u => u.id === g.userId)?.isAuth })
+    for (const o of orders) Object.assign(o, { itemName: goods.find(g => g.id === o.itemId)?.name, itemImg: goods.find(g => g.id === o.itemId)?.img })
+  }
   const success = data => ({ code: '200', msg: '模拟操作成功', data: structuredClone(data) })
   const failure = msg => ({ code: '400', msg: msg || '此操作未在演示版开放', data: null })
   const now = () => new Date().toISOString().slice(0, 19).replace('T', ' ')
@@ -25,8 +37,11 @@ export function createDemoApi() {
     params ||= {}
     const path = url.split('?')[0]
     if (path === '/web/login') {
-      if (body.password !== 'demo' || !['demo', 'admin'].includes(body.username)) return failure('演示账号：demo 或 admin；密码：demo')
-      account = body.role === 'ROLE_ADMIN' ? admins[0] : users[0]
+      const candidates = body.role === 'ROLE_ADMIN' ? admins : users
+      const selected = ['demo', 'admin'].includes(body.username) ? candidates[0] : candidates.find(u => u.username === body.username)
+      if (body.password !== 'demo' || !selected) return failure('演示账号：demo 或 admin；密码：demo')
+      account = selected
+      if (seed) collects = seed.collect.filter(c => c.userId === account.id).map(c => c.itemId)
       return success(account)
     }
     if (path === '/web/userInfo') return success(account)
@@ -43,7 +58,7 @@ export function createDemoApi() {
     if (path.startsWith('/collect/') && method === 'delete') { collects = collects.filter(id => id !== Number(path.split('/').at(-1))); return success(null) }
     if (path === '/chat/user') return success(users.filter(u => u.id !== account.id).map(u => ({ ...u, count: 1, online: false })))
     if (path.startsWith('/chat/user/')) return success({ ...users.find(u => u.id === Number(path.split('/').at(-1))), count: 0 })
-    if (path === '/chat/message') return success(chats.filter(c => [Number(params.fromUserId), Number(params.toUserId)].includes(c.fromUserId)))
+    if (path === '/chat/message') return success(chats.filter(c => (c.fromUserId === Number(params.fromUserId) && c.toUserId === Number(params.toUserId)) || (c.fromUserId === Number(params.toUserId) && c.toUserId === Number(params.fromUserId))))
     if (path === '/chat/clear') return success(null)
     if (path === '/chat' && method === 'post') { chats.push({ ...body, id: nextId++ }); return success(null) }
     const action = path.match(/^\/orders\/(pay|cancel|receipt)\/(\d+)$/)
@@ -57,7 +72,9 @@ export function createDemoApi() {
     if (path === '/orders' && method === 'post' && !body.id) {
       const item = goods.find(g => g.id === Number(body.itemId))
       if (!item || item.status !== '已上架') return failure('商品不可购买')
-      const order = { ...addresses[0], ...body, id: nextId++, no: 'DEMO-' + nextId, itemName: item.name, itemImg: item.img, fromId: item.userId, toId: account.id, price: item.price, status: '待支付', time: now(), shipment: item.shipment }
+      const address = body.addressId ? addresses.find(a => a.id === Number(body.addressId) && a.userId === account.id) : addresses.find(a => a.userId === account.id)
+      if (body.addressId && !address) return failure('收货地址不存在')
+      const order = { ...address, ...body, id: nextId++, no: 'DEMO-' + nextId, itemName: item.name, itemImg: item.img, fromId: item.userId, toId: account.id, price: item.price, status: '待支付', time: now(), shipment: item.shipment }
       orders.push(order)
       return success(order)
     }
@@ -82,17 +99,19 @@ export function createDemoApi() {
       return item ? success({ ...item, isCollected: collects.includes(item.id) }) : failure('记录不存在')
     }
     let rows = [...table]
+    if (collection === 'address' && account.role !== 'ROLE_ADMIN') rows = rows.filter(a => a.userId === account.id)
     if (path === '/goods/front' || path === '/goods/front/page') rows = rows.filter(g => g.status === '已上架')
     if (path === '/goods/collect/page') rows = rows.filter(g => collects.includes(g.id)).map(g => ({ ...g, collectId: g.id }))
     if (/\/(goods|orders)\/user\//.test(path)) rows = rows.filter(g => (g.userId ?? g.fromId) === Number(path.split('/').at(-1)))
     if (path === '/orders/front/page') rows = rows.filter(o => (params.flag === '我卖出的' ? o.fromId : o.toId) === account.id)
-    if (params.keyword) rows = rows.filter(g => String(g.name || g.itemName || '').includes(params.keyword))
+    if (params.keyword?.trim()) rows = rows.filter(g => String(g.name || g.itemName || '').includes(params.keyword.trim()))
     if (Number(params.typeId)) rows = rows.filter(g => g.typeId === Number(params.typeId))
     if (params.country) rows = rows.filter(g => g.place?.startsWith(params.country))
     if (params.status && params.status !== '全部') rows = rows.filter(g => g.status === params.status)
     if (params.sortBy === 'price') rows.sort((a, b) => a.price - b.price)
     if (params.sortBy === 'new') rows.reverse()
     if (path.endsWith('/page')) {
+      if (Number(params.pageSize) === -1) return success({ records: rows, total: rows.length })
       const pageNum = Math.max(1, Number(params.pageNum) || 1), pageSize = Math.max(1, Number(params.pageSize) || 10)
       return success({ records: rows.slice((pageNum - 1) * pageSize, pageNum * pageSize), total: rows.length })
     }

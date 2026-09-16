@@ -1,5 +1,6 @@
 import axios from 'axios'
 import { createDemoApi } from '../demo/api.js'
+import originalData from '../demo/original-data.json'
 import router from '@/router'
 import { serverHost } from '../../config/config.default'
 // 使用Element Plus组件进行错误信息提示
@@ -12,7 +13,7 @@ const request = axios.create({
 
 // Demo builds use only synthetic, in-memory data; normal builds keep the original backend.
 if (import.meta.env.VITE_DEMO_MODE === 'true') {
-    const demoApi = createDemoApi()
+    const demoApi = createDemoApi(originalData, import.meta.env.BASE_URL)
     request.defaults.adapter = async config => ({
         data: await demoApi(config.method, config.url,
             typeof config.data === 'string' ? JSON.parse(config.data) : config.data, config.params),
