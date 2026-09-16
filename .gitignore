@@ -9,6 +9,9 @@
 !/sql/
 !/scripts/
 !/.github/
+!/产品文档/
+/产品文档/*
+!/产品文档/*.md
 node_modules/
 dist/
 target/
