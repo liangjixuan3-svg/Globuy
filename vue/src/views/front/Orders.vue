@@ -4,9 +4,11 @@ import {reactive, ref, watch, onMounted, onUnmounted} from 'vue'
 import request from "@/utils/request.js";
 import {ElMessage, ElMessageBox} from "element-plus";
 import {convertPrice, getCurrencySymbol} from '@/utils/currency'
+import {useRoute} from 'vue-router'
 
 const activeTab = ref('全部')
-const selectedSidebar = ref('我卖出的')
+const route = useRoute()
+const selectedSidebar = ref(route.query.flag === '我买到的' ? '我买到的' : '我卖出的')
 
 // 倒计时相关
 const now = ref(new Date())

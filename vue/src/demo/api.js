@@ -29,7 +29,11 @@ export function createDemoApi(seed, baseUrl = '/') {
   }
   const success = data => ({ code: '200', msg: '模拟操作成功', data: structuredClone(data) })
   const failure = msg => ({ code: '400', msg: msg || '此操作未在演示版开放', data: null })
-  const now = () => new Date().toISOString().slice(0, 19).replace('T', ' ')
+  const now = () => {
+    const date = new Date()
+    const pad = n => String(n).padStart(2, '0')
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`
+  }
   const popular = (a, b) => (b.num || 0) - (a.num || 0)
   const hasCollect = id => collects.some(c => c.userId === account.id && c.itemId === id)
   const wrapGoods = g => {

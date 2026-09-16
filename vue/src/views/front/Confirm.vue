@@ -111,7 +111,7 @@ const doPay = () => {
 const cancelPay = () => {
   payVisible.value = false
   ElMessage.info('订单已保存至“我的订单”，请在5分钟内完成支付')
-  router.push('/front/orders')
+  router.push({ path: '/front/orders', query: { flag: '我买到的' } })
 }
 
 
