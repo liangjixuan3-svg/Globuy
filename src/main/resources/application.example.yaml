@@ -1,0 +1,26 @@
+# Copy to application.yaml for local use. Never commit real credentials.
+server:
+  port: 9090
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${ip}:3306/secondhand?useSSL=false&useUnicode=true&characterEncoding=UTF-8&serverTimezone=GMT%2b8&allowPublicKeyRetrieval=true
+    username: ${DB_USERNAME:root}
+    password: ${DB_PASSWORD:}
+  servlet:
+    multipart:
+      max-file-size: 100MB
+      max-request-size: 100MB
+mybatis-plus:
+  mapper-locations: classpath:mapper/*.xml
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      update-strategy: IGNORED
+ip: ${DB_HOST:127.0.0.1}
+ai:
+  deepseek:
+    api-key: ${DEEPSEEK_API_KEY:your-api-key-here}
+    base-url: https://api.deepseek.com/v1
+    model: deepseek-chat

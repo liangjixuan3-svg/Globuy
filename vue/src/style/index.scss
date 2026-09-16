@@ -1,0 +1,185 @@
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  width: 100% !important;
+  height: auto !important;
+  margin: 0;
+  padding: 0;
+  font-size: 14px;
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+}
+
+ul,
+ol,
+li {
+  margin: 0;
+  padding: 0;
+}
+
+a {
+  text-decoration: none;
+  color: inherit;
+}
+
+#app {
+  width: 100%;
+  height: 100%;
+  font-size: 14px;
+}
+
+/* 主题变量 */
+.theme1 {
+  --color-primary: rgb(64, 132, 217);
+  --font-color-primary: rgb(64, 132, 217);
+  --back-color-primary: rgba(64, 132, 217, 0.1);
+  @extend .back-class
+}
+
+.theme2 {
+  --color-primary: rgb(245, 34, 45);
+  --font-color-primary: rgb(245, 34, 45);
+  --back-color-primary: rgba(245, 34, 45, 0.1);
+  @extend .back-class
+}
+
+.theme3 {
+  --color-primary: rgb(250, 84, 28);
+  --font-color-primary: rgb(250, 84, 28);
+  --back-color-primary: rgba(250, 84, 28, 0.1);
+  @extend .back-class
+}
+
+.theme4 {
+  --color-primary: rgb(250, 173, 20);
+  --font-color-primary: rgb(250, 173, 20);
+  --back-color-primary: rgba(250, 173, 20, 0.1);
+  @extend .back-class
+}
+
+.theme5 {
+  --color-primary: rgb(19, 194, 194);
+  --font-color-primary: rgb(19, 194, 194);
+  --back-color-primary: rgba(19, 194, 194, 0.1);
+  @extend .back-class
+}
+
+.theme6 {
+  --color-primary: rgb(82, 196, 26);
+  --font-color-primary: rgb(82, 196, 26);
+  --back-color-primary: rgba(82, 196, 26, 0.1);
+  @extend .back-class
+}
+
+.theme7 {
+  --color-primary: rgb(47, 84, 235);
+  --font-color-primary: rgb(47, 84, 235);
+  --back-color-primary: rgba(47, 84, 235, 0.1);
+  @extend .back-class
+}
+
+.theme8 {
+  --color-primary: rgb(114, 46, 209);
+  --font-color-primary: rgb(114, 46, 209);
+  --back-color-primary: rgba(114, 46, 209, 0.1);
+  @extend .back-class
+}
+
+.back-class{
+
+  .ml-10 {
+    margin-left: 10px;
+  }
+  .mr-10 {
+    margin-right: 10px;
+  }
+
+  /* 主容器样式 */
+  .content-container {
+    padding: 10px;
+  }
+
+  /* 在搜索区域和下方内容之间添加间距 */
+  .header-section {
+    margin-bottom: 16px;
+  }
+
+  /* 为搜索输入框设置固定宽度以保持一致的布局 */
+  .filter-input {
+    width: 200px;
+  }
+
+  /* 在操作按钮区域和下方内容之间添加间距 */
+  .toolbar-section {
+    margin-bottom: 16px;
+  }
+
+  /* 将分页控件定位在表格的右下方 */
+  .pagination-section {
+    margin-top: 16px; /* 在表格和分页之间添加空间 */
+  }
+
+  /* 将头像和上传按钮并排排列并保持适当间距 */
+  .upload-container {
+    display: flex;
+    align-items: center; /* 垂直居中头像和按钮 */
+    gap: 16px; /* 头像和上传按钮之间的间距 */
+  }
+
+  /* 居中显示对话框按钮并保持一致的间距 */
+  .dialog-footer {
+    display: flex;
+    justify-content: center; /* 水平居中按钮 */
+    gap: 16px; /* 取消和确认按钮之间的间距 */
+  }
+
+  .el-button:focus,
+  .el-button:hover {
+    background: var(--font-color-primary);
+    border-color: var(--back-color-primary);
+    color: #fff;
+  }
+
+  .el-button--primary{
+    color: var(--font-color-primary);
+    background-color: var(--back-color-primary);
+    border-color: var(--back-color-primary);
+  }
+
+  .el-button--primary:focus,
+  .el-button--primary:hover {
+    background: var(--font-color-primary);
+    border-color: var(--back-color-primary);
+    color: #fff;
+  }
+
+  .el-button--danger{
+    color: rgb(214, 48, 49);
+    background-color: rgb(214, 48, 49,0.1);
+    border-color: rgb(214, 48, 49,0.1);
+  }
+
+  .el-button--danger:focus,
+  .el-button--danger:hover {
+    background: rgb(214, 48, 49);
+    border-color: rgb(214, 48, 49,0.1);
+    color: #fff;
+  }
+
+  .el-button--info{
+    color: rgb(197, 197, 197);
+    background-color: rgba(197, 197, 197, 0.1);
+    border-color: rgb(197, 197, 197,0.1);
+  }
+
+  .el-button--info:focus,
+  .el-button--info:hover {
+    background: var(--font-color-primary);
+    border-color: var(--back-color-primary);
+    color: #fff;
+  }
+
+}

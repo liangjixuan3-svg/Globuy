@@ -1,0 +1,28 @@
+# Allowlist: new root files are private until explicitly approved.
+/*
+!/.gitignore
+!/README.md
+!/NOTICE.md
+!/pom.xml
+!/src/
+!/vue/
+!/sql/
+!/scripts/
+!/.github/
+node_modules/
+dist/
+target/
+.DS_Store
+.idea/
+.env
+.env.*
+*.log
+*.pem
+*.key
+# Keep original local credentials and database dump completely out of Git.
+/src/main/resources/application.yaml
+/src/main/resources/application-local.*
+/sql/*
+!/sql/schema.sql
+/files/
+/vue/check_*.js
